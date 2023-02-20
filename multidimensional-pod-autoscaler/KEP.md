@@ -1,4 +1,4 @@
-# KEP-5342: Multi-dimensional Pod Autoscaler
+# KEP-NNNN: Multi-dimensional Pod Autoscaler
 
 <!-- toc -->
 - [Release Signoff Checklist](#release-signoff-checklist)
@@ -61,7 +61,7 @@ Items marked with (R) are required *prior to targeting to a milestone / release*
 Currently, Horizontal Pod Autoscaler (HPA) and Vertical Pod Autoscaler (VPA) control the scaling actions separately as independent controllers to determine the resource allocation for a containerized application.
 Due to the independence of these two controllers, when they are configured to optimize the same target, e.g., CPU usage, they can lead to an awkward situation where HPA tries to spin more pods based on the higher-than-threshold CPU usage while VPA tries to squeeze the size of each pod based on the lower CPU usage (after scaling out by HPA).
 The final outcome would be a large number of small pods created for the workloads.
-Manual fine-tuning the timing to do vertical/horizontal scaling and prioritization are usually needed for synchronization of the HPA and VPA.
+Manual fine-tuning the timing to do vertical/horizontal scaling and prioritization are usually needed for syncronization of the HPA and VPA.
 
 We propose a Multi-dimensional Pod Autoscaling (MPA) framework that combines the actions of vertical and horizontal autoscaling in a single action but separates the actuation completely from the controlling algorithms.
 It consists of three controllers (i.e., a recommender, an updater, and an admission controller) and an MPA API (i.e., a CRD object or CR) that connects the autoscaling recommendations to actuation.
@@ -83,7 +83,7 @@ Still, HPA tries to scale out the applications to improve the customized perform
 It is also [not recommended] to use HPA together with VPA for CPU or memory metrics.
 Therefore, there is a need to combine the two controllers so that horizontal and vertical scaling decisions are made in combination for an application to achieve both objectives, including resource efficiency and the application service-level agreements (SLA)/performance goals.
 However, existing VPA/HPA designs cannot accommodate such requirements.
-Manual fine-tuning the timing or frequency to do vertical/horizontal scaling and prioritization are usually needed for synchronization of the HPA and VPA.
+Manual fine-tuning the timing or frequency to do vertical/horizontal scaling and prioritization are usually needed for syncronization of the HPA and VPA.
 
 [HPA]: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
 [VPA]: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
@@ -348,7 +348,7 @@ MPA can be disabled by executing `./deploy/mpa-down.sh`.
 
 #### What happens if we reenable the feature if it was previously rolled back?
 
-No impact will happen because everytime MPA is enabled it is a full new reset and restart of MPA.
+Everytime enabling MPA is a full new reset and restart.
 
 #### Are there any tests for feature enablement/disablement?
 
