@@ -32,6 +32,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/kubernetes/test/e2e/framework"
+	e2edebug "k8s.io/kubernetes/test/e2e/framework/debug"
 	e2ekubectl "k8s.io/kubernetes/test/e2e/framework/kubectl"
 	e2erc "k8s.io/kubernetes/test/e2e/framework/rc"
 	"k8s.io/kubernetes/test/e2e/framework/resource"
@@ -66,7 +67,7 @@ const (
 
 var (
 	resourceConsumerImage = imageutils.GetE2EImage(imageutils.ResourceConsumer)
-	stressCommand         = []string{"/stress", "--mem-total", "10000000000", "--logtostderr", "--mem-alloc-size", "8000"}
+	stressCommand         = []string{"/stress", "--mem-total", "10000000000", "--logtostderr", "--mem-alloc-size", "50000"}
 )
 
 var (
@@ -373,7 +374,7 @@ func runServiceAndWorkloadForResourceConsumer(c clientset.Interface, ns, name st
 			RCConfig: rcConfig,
 		}
 		ginkgo.By(fmt.Sprintf("creating deployment %s in namespace %s", dpConfig.Name, dpConfig.Namespace))
-		dpConfig.NodeDumpFunc = framework.DumpNodeDebugInfo
+		dpConfig.NodeDumpFunc = e2edebug.DumpNodeDebugInfo
 		dpConfig.ContainerDumpFunc = e2ekubectl.LogFailedContainers
 		framework.ExpectNoError(testutils.RunDeployment(dpConfig))
 	case KindReplicaSet:
@@ -426,7 +427,7 @@ func runServiceAndWorkloadForResourceConsumer(c clientset.Interface, ns, name st
 // runReplicaSet launches (and verifies correctness) of a replicaset.
 func runReplicaSet(config testutils.ReplicaSetConfig) error {
 	ginkgo.By(fmt.Sprintf("creating replicaset %s in namespace %s", config.Name, config.Namespace))
-	config.NodeDumpFunc = framework.DumpNodeDebugInfo
+	config.NodeDumpFunc = e2edebug.DumpNodeDebugInfo
 	config.ContainerDumpFunc = e2ekubectl.LogFailedContainers
 	return testutils.RunReplicaSet(config)
 }
@@ -443,15 +444,15 @@ func runOomingReplicationController(c clientset.Interface, ns, name string, repl
 		Timeout:     timeoutRC,
 		Replicas:    replicas,
 		Annotations: make(map[string]string),
-		MemRequest:  1024 * 1024 * 1024,
-		MemLimit:    1024 * 1024 * 1024,
+		MemRequest:  1024 * 1024 * 300,
+		MemLimit:    1024 * 1024 * 500,
 	}
 
 	dpConfig := testutils.DeploymentConfig{
 		RCConfig: rcConfig,
 	}
 	ginkgo.By(fmt.Sprintf("Creating deployment %s in namespace %s", dpConfig.Name, dpConfig.Namespace))
-	dpConfig.NodeDumpFunc = framework.DumpNodeDebugInfo
+	dpConfig.NodeDumpFunc = e2edebug.DumpNodeDebugInfo
 	dpConfig.ContainerDumpFunc = e2ekubectl.LogFailedContainers
 	framework.ExpectNoError(testutils.RunDeployment(dpConfig))
 }
